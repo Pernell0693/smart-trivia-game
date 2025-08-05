@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Cities Trivia</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f4f4f4; }
+    #game, #results, #explanation { display: none; }
+    .card { background: #fff; padding: 20px; border-radius: 10px; max-width: 650px; margin: 40px auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    button { padding: 10px 20px; margin-top: 15px; border: none; background: #0077cc; color: white; font-size: 16px; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #005fa3; }
+    .question { font-weight: bold; margin-bottom: 15px; }
+    .option { display: block; margin: 8px 0; }
+    .snippet { background: #eef7ff; padding: 15px; border-left: 5px solid #0077cc; margin-top: 20px; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+  <!-- Landing Page -->
+  <div id="landing" class="card">
+    <h2>Welcome to Smart Cities Trivia!</h2>
+    <p>Learn about smart city technologies while testing your knowledge. Select an answer, see if you’re right or wrong, 
+       and read a quick lesson before moving on. Your final score will show at the end.</p>
+    <button onclick="startGame()">Start Game</button>
+  </div>
+
+  <!-- Game Page -->
+  <div id="game" class="card">
+    <div id="question-container"></div>
+  </div>
+
+  <!-- Explanation Page -->
+  <div id="explanation" class="card">
+    <h3 id="feedback"></h3>
+    <div id="snippet" class="snippet"></div>
+    <button onclick="nextQuestion()">Next Question</button>
+  </div>
+
+  <!-- Results Page -->
+  <div id="results" class="card">
+    <h2>Game Over!</h2>
+    <p id="score"></p>
+    <button onclick="restartGame()">Play Again</button>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "What does the term 'digital divide' refer to?",
+        options: [
+          "The difference between urban and rural transport systems",
+          "The gap between those with and without access to digital technology",
+          "A firewall used to protect city data",
+          "The division of a city’s energy grid"
+        ],
+        answer: 1,
+        snippet: "The digital divide refers to the gap between individuals and communities that have access to modern information and communication technology, and those that don’t."
+      },
+      {
+        question: "Which technology helps reduce traffic congestion in smart cities?",
+        options: [
+          "Smart traffic lights",
+          "Traditional stop signs",
+          "Manual toll booths",
+          "Paper maps"
+        ],
+        answer: 0,
+        snippet: "Smart traffic lights use sensors and real-time data to adjust light cycles, reducing traffic congestion and improving safety."
+      },
+      {
+        question: "Which system uses sensors to lower energy use in buildings?",
+        options: [
+          "Smart HVAC",
+          "Manual thermostats",
+          "Gas furnaces",
+          "Ceiling fans"
+        ],
+        answer: 0,
+        snippet: "Smart HVAC systems use IoT sensors to monitor occupancy and conditions, adjusting heating and cooling to save energy."
+      },
+      {
+        question: "What platform allows residents to access services like permits online?",
+        options: [
+          "City Hall Only",
+          "Open Data Portals",
+          "Social Media",
+          "Library Bulletin Boards"
+        ],
+        answer: 1,
+        snippet: "Open Data Portals provide online access to city services, allowing residents to apply for permits, check zoning info, and explore city datasets."
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function startGame() {
+      document.getElementById('landing').style.display = 'none';
+      document.getElementById('game').style.display = 'block';
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const q = questions[currentQuestion];
+      const container = document.getElementById('question-container');
+      container.innerHTML = `
+        <div class="question">${q.question}</div>
+        ${q.options.map((opt, i) => `
+          <label class="option">
+            <input type="radio" name="answer" value="${i}" onclick="submitAnswer(${i})">
+            ${opt}
+          </label>
+        `).join('')}
+      `;
+    }
+
+    function submitAnswer(selected) {
+      if (selected === questions[currentQuestion].answer) {
+        score++;
+        document.getElementById('feedback').innerText = "✅ Correct!";
+      } else {
+        document.getElementById('feedback').innerText = "❌ Wrong!";
+      }
+
+      document.getElementById('snippet').innerText = questions[currentQuestion].snippet;
+      document.getElementById('game').style.display = 'none';
+      document.getElementById('explanation').style.display = 'block';
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        document.getElementById('explanation').style.display = 'none';
+        document.getElementById('game').style.display = 'block';
+        showQuestion();
+      } else {
+        endGame();
+      }
+    }
+
+    function endGame() {
+      document.getElementById('explanation').style.display = 'none';
+      document.getElementById('results').style.display = 'block';
+      document.getElementById('score').innerText = `You scored ${score} out of ${questions.length}!`;
+    }
+
+    function restartGame() {
+      currentQuestion = 0;
+      score = 0;
+      document.getElementById('results').style.display = 'none';
+      document.getElementById('landing').style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>
