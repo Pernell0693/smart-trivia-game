@@ -1,235 +1,538 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Cities Trivia</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(135deg, #0077cc, #00c6ff);
-      color: #333;
-    }
-    header {
-      text-align: center;
-      color: white;
-      padding: 30px 10px;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 2.5em;
-    }
-    .card {
-      background: #fff;
-      padding: 25px;
-      border-radius: 15px;
-      max-width: 700px;
-      margin: 20px auto;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Smart Cities Trivia Game</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: #fff;
+  }
+  #game-container {
+    background: rgba(0,0,0,0.7);
+    padding: 25px 35px;
+    border-radius: 15px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 0 25px rgba(255,255,255,0.15);
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+  #start-screen, #question-container, #feedback, #end-screen {
+    display: none;
+  }
+  #start-screen.active,
+  #question-container.active,
+  #feedback.active,
+  #end-screen.active {
+    display: block;
+  }
+  button {
+    background: #fdbb2d;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #222;
+    transition: background 0.3s ease;
+    margin: 10px auto;
+    display: block;
+    width: fit-content;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+  button:hover {
+    background: #e5a10f;
+  }
+  .question-image {
+    max-width: 100%;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  }
+  .question-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    line-height: 1.4;
+  }
+  .options {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+  }
+  .options li {
+    background: rgba(255,255,255,0.1);
+    padding: 12px 18px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background 0.25s ease;
+  }
+  .options li:hover {
+    background: rgba(255,255,255,0.2);
+  }
+  .options li.selected {
+    background: #fdbb2d;
+    color: #222;
+    font-weight: 700;
+  }
+  .feedback-text {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+  .snippet-text {
+    font-size: 1rem;
+    font-style: italic;
+    opacity: 0.85;
+  }
+  #score {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 25px;
+  }
+  #end-screen button {
+    width: 45%;
+  }
+  #buttons-row {
+    display: flex;
+    justify-content: space-around;
+    gap: 10px;
+  }
+  @media (max-width: 480px) {
+    #game-container {
+      padding: 20px;
     }
     button {
-      padding: 12px 25px;
-      margin-top: 15px;
-      border: none;
-      background: #0077cc;
-      color: white;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
+      font-size: 1rem;
+      padding: 10px 18px;
     }
-    button:hover {
-      background: #005fa3;
+    .question-text {
+      font-size: 1.1rem;
     }
-    .question {
-      font-weight: bold;
-      margin-bottom: 15px;
-    }
-    .option {
-      display: block;
-      margin: 10px 0;
-      padding: 10px;
-      background: #f9f9f9;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .snippet {
-      background: #eef7ff;
-      padding: 15px;
-      border-left: 5px solid #0077cc;
-      margin-top: 20px;
-      border-radius: 5px;
-    }
-    .correct { color: green; font-weight: bold; }
-    .incorrect { color: red; font-weight: bold; }
-    #progress {
-      background: #ddd;
-      border-radius: 10px;
-      height: 15px;
-      margin-bottom: 20px;
-    }
-    #progress-bar {
-      width: 0%;
-      background: #0077cc;
-      height: 15px;
-      border-radius: 10px;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
 
-  <header>
-    <h1>🌆 Smart Cities Trivia</h1>
-    <p>Learn & Play: Explore how technology shapes our cities</p>
-  </header>
+<div id="game-container">
 
-  <!-- Landing Page -->
-  <div id="landing" class="card">
-    <h2>Welcome!</h2>
-    <p>Test your knowledge about Smart City technologies. Select an answer, get instant feedback, 
-       and learn with quick lessons after each question.</p>
-    <button onclick="startGame()">Start Game</button>
+  <div id="start-screen" class="active">
+    <h1>Welcome to Smart Cities Trivia!</h1>
+    <p style="text-align:center; font-style: italic; margin-bottom: 20px;">
+      Test your knowledge about futuristic smart city technologies including AI, LIDAR, drones, and more. Click Start to begin!
+    </p>
+    <button id="start-btn">Start Game</button>
   </div>
 
-  <!-- Game Page -->
-  <div id="game" class="card">
-    <div id="progress">
-      <div id="progress-bar"></div>
+  <div id="question-container">
+    <img id="question-image" class="question-image" src="" alt="Question Image" style="display:none;" />
+    <div id="question-text" class="question-text"></div>
+    <ul id="options-list" class="options"></ul>
+  </div>
+
+  <div id="feedback">
+    <div id="feedback-result" class="feedback-text"></div>
+    <div id="feedback-snippet" class="snippet-text"></div>
+    <button id="next-btn">Next Question</button>
+  </div>
+
+  <div id="end-screen">
+    <div id="score"></div>
+    <div id="buttons-row">
+      <button id="play-again-btn">Play Again</button>
+      <button id="exit-btn">Exit</button>
     </div>
-    <div id="question-container"></div>
   </div>
 
-  <!-- Explanation Page -->
-  <div id="explanation" class="card">
-    <h3 id="feedback"></h3>
-    <div id="snippet" class="snippet"></div>
-    <button onclick="nextQuestion()">Next Question</button>
-  </div>
+</div>
 
-  <!-- Results Page -->
-  <div id="results" class="card">
-    <h2>🎉 Game Over!</h2>
-    <p id="score"></p>
-    <button onclick="restartGame()">Play Again</button>
-  </div>
+<script>
+const questions = [
+  {
+    question: "What technology uses lasers to create detailed 3D maps of city landscapes?",
+    options: ["Radar", "LIDAR", "Sonar", "Infrared Imaging"],
+    answer: 1,
+    snippet: "LIDAR uses lasers to scan and create precise 3D maps."
+  },
+  {
+    question: "Which AI technique helps predict and manage city traffic in real-time?",
+    options: [
+      "Natural Language Processing",
+      "Machine Learning",
+      "Blockchain",
+      "Virtual Reality"
+    ],
+    answer: 1,
+    snippet: "Machine Learning algorithms analyze data to optimize traffic flow dynamically."
+  },
+  {
+    question: "Drones in smart cities are commonly used for:",
+    options: [
+      "Delivering mail only",
+      "Environmental monitoring and infrastructure inspection",
+      "Painting buildings",
+      "None of the above"
+    ],
+    answer: 1,
+    snippet: "Drones help monitor city infrastructure and environment efficiently.",
+    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=700&q=80"
+  },
+  {
+    question: "Smart streetlights can reduce energy use by:",
+    options: [
+      "Staying on at full brightness all night",
+      "Adjusting brightness based on pedestrian presence",
+      "Flashing continuously",
+      "Turning off during the day only"
+    ],
+    answer: 1,
+    snippet: "Smart streetlights use sensors to dim or brighten depending on nearby movement."
+  },
+  {
+    question: "Which technology allows autonomous vehicles to detect obstacles?",
+    options: [
+      "GPS only",
+      "LIDAR combined with cameras and radar",
+      "Radio signals",
+      "Bluetooth"
+    ],
+    answer: 1,
+    snippet: "Autonomous vehicles combine LIDAR, cameras, and radar to detect surroundings accurately."
+  },
+  {
+    question: "AI-powered waste management systems optimize:",
+    options: [
+      "Recycling sorting",
+      "Collection route scheduling",
+      "Waste reduction predictions",
+      "All of the above"
+    ],
+    answer: 3,
+    snippet: "AI helps automate sorting, route planning, and forecasting for efficient waste management."
+  },
+  {
+    question: "What is the main function of eVTOLs in urban settings?",
+    options: [
+      "Personal drones for fun",
+      "Air taxis and cargo delivery",
+      "Weather monitoring",
+      "Police surveillance only"
+    ],
+    answer: 1,
+    snippet: "eVTOLs are electric vertical take-off and landing vehicles used for fast transport and delivery.",
+    image: "https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=700&q=80"
+  },
+  {
+    question: "Which is NOT a typical feature of smart buildings?",
+    options: [
+      "Automated lighting control",
+      "Real-time occupancy sensing",
+      "Manual thermostats only",
+      "Predictive maintenance alerts"
+    ],
+    answer: 2,
+    snippet: "Smart buildings rely on automated systems, not manual-only controls like old thermostats."
+  },
+  {
+    question: "Which smart city system helps residents find available parking spots?",
+    options: [
+      "Smart Parking Sensors",
+      "Traditional parking meters",
+      "Hand signals from police officers",
+      "Paper maps"
+    ],
+    answer: 0,
+    snippet: "Sensors detect open spots and help drivers find parking efficiently."
+  },
+  {
+    question: "What does AI help with in public safety systems?",
+    options: [
+      "Recognizing faces in crowds",
+      "Detecting unusual behavior",
+      "Predicting crime hotspots",
+      "All except predicting crime hotspots"
+    ],
+    answer: 3,
+    snippet: "AI can detect faces and behaviors but crime prediction remains challenging."
+  },
+  {
+    question: "How do smart grids improve energy efficiency?",
+    options: [
+      "By using AI to balance supply and demand",
+      "By cutting electricity to random neighborhoods",
+      "By ignoring renewable energy sources",
+      "By disconnecting all users at night"
+    ],
+    answer: 0,
+    snippet: "AI in smart grids optimizes energy use and integrates renewables effectively."
+  },
+  {
+    question: "Which challenge do drone delivery services often face?",
+    options: [
+      "Navigating congested airspace",
+      "Battery life constraints",
+      "Regulatory restrictions",
+      "All of the above"
+    ],
+    answer: 3,
+    snippet: "Airspace management, battery limits, and regulations all challenge drone delivery."
+  },
+  {
+    question: "What smart city technology monitors water leaks?",
+    options: [
+      "IoT sensors in water pipes",
+      "Manual inspections only",
+      "Phone apps without sensors",
+      "None of the above"
+    ],
+    answer: 0,
+    snippet: "IoT sensors detect leaks early, preventing water waste and damage.",
+    image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=700&q=80"
+  },
+  {
+    question: "How does AI improve urban healthcare?",
+    options: [
+      "Remote patient monitoring",
+      "Predicting disease outbreaks",
+      "Optimizing hospital workflows",
+      "All of the above"
+    ],
+    answer: 3,
+    snippet: "AI supports healthcare through monitoring, prediction, and management."
+  },
+  {
+    question: "What role does LIDAR play in environmental monitoring?",
+    options: [
+      "Measuring forest canopy height",
+      "Tracking urban heat islands",
+      "Detecting coastal erosion",
+      "All of the above"
+    ],
+    answer: 3,
+    snippet: "LIDAR helps monitor forests, heat islands, and coastal changes."
+  },
+  {
+    question: "Which platform lets residents access city data and services online?",
+    options: [
+      "Social media",
+      "Open Data Portals",
+      "Local newspapers",
+      "Bulletin boards"
+    ],
+    answer: 1,
+    snippet: "Open Data Portals provide easy online access to city information and services."
+  },
+  {
+    question: "Which AI application supports disaster response?",
+    options: [
+      "Predicting disasters using sensor data",
+      "Coordinating emergency resources",
+      "Analyzing damage after events",
+      "Streaming live sports events"
+    ],
+    answer: 3,
+    snippet: "Live sports streaming is unrelated to disaster management."
+  },
+  {
+    question: "What is a common use of AI in retail within smart cities?",
+    options: [
+      "Personalizing shopping experiences",
+      "Managing inventory",
+      "Predicting customer behavior",
+      "All except managing inventory"
+    ],
+    answer: 0,
+    snippet: "AI personalizes shopping and predicts trends, but inventory may still need manual checks."
+  },
+  {
+    question: "Which technology do autonomous buses primarily rely on?",
+    options: [
+      "GPS alone",
+      "LIDAR and AI for navigation",
+      "Human drivers only",
+      "Paper route maps"
+    ],
+    answer: 1,
+    snippet: "Autonomous buses use LIDAR and AI to navigate safely.",
+    image: "https://images.unsplash.com/photo-1533055640609-24b498cdfa20?auto=format&fit=crop&w=700&q=80"
+  },
+  {
+    question: "How do smart mobility platforms improve urban transportation?",
+    options: [
+      "Optimizing ride-sharing routes",
+      "Predicting traffic jams",
+      "Planning multi-modal trips",
+      "Ignoring passenger needs"
+    ],
+    answer: 3,
+    snippet: "Ignoring passengers is NOT a feature of smart mobility platforms."
+  },
+  {
+    question: "Which sensor helps smart buildings detect occupancy?",
+    options: [
+      "Infrared motion sensors",
+      "Temperature sensors only",
+      "Microphones only",
+      "None of the above"
+    ],
+    answer: 0,
+    snippet: "Infrared sensors detect movement to optimize building systems."
+  },
+  {
+    question: "What is a benefit of AI-powered educational platforms in cities?",
+    options: [
+      "Personalized learning paths",
+      "Real-time student feedback",
+      "Automated grading",
+      "Only scheduling classes"
+    ],
+    answer: 3,
+    snippet: "Scheduling is important but not the main benefit of AI in education."
+  },
+  {
+    question: "What’s a key advantage of smart water management?",
+    options: [
+      "Increasing water waste",
+      "Detecting leaks early",
+      "Increasing water cost unnecessarily",
+      "None of the above"
+    ],
+    answer: 1,
+    snippet: "Early leak detection saves water and reduces costs."
+  },
+  {
+    question: "What tech helps autonomous vehicles communicate with city infrastructure?",
+    options: [
+      "V2I (Vehicle-to-Infrastructure) communication",
+      "Radio stations",
+      "Human signals",
+      "Paper road signs"
+    ],
+    answer: 0,
+    snippet: "V2I enables cars to interact with traffic lights and road sensors."
+  },
+  {
+    question: "Which futuristic drone feature could improve emergency medical services?",
+    options: [
+      "Delivering medical supplies quickly",
+      "Transporting patients via air",
+      "Scouting disaster zones",
+      "All of the above"
+    ],
+    answer: 3,
+    snippet: "Drones can assist medical deliveries, air transport, and reconnaissance.",
+    image: "https://images.unsplash.com/photo-1521334884684-d80222895322?auto=format&fit=crop&w=700&q=80"
+  }
+];
 
-  <script>
-    const questions = [
-      {
-        question: "What does the term 'digital divide' refer to?",
-        options: [
-          "The difference between urban and rural transport systems",
-          "The gap between those with and without access to digital technology",
-          "A firewall used to protect city data",
-          "The division of a city’s energy grid"
-        ],
-        answer: 1,
-        snippet: "📶 The digital divide is the gap between those with and without access to digital technology like the internet and computers."
-      },
-      {
-        question: "Which technology helps reduce traffic congestion in smart cities?",
-        options: [
-          "Smart traffic lights",
-          "Traditional stop signs",
-          "Manual toll booths",
-          "Paper maps"
-        ],
-        answer: 0,
-        snippet: "🚦 Smart traffic lights use sensors and real-time data to optimize traffic flow, reducing congestion and emissions."
-      },
-      {
-        question: "Which system uses sensors to lower energy use in buildings?",
-        options: [
-          "Smart HVAC",
-          "Manual thermostats",
-          "Gas furnaces",
-          "Ceiling fans"
-        ],
-        answer: 0,
-        snippet: "🌡️ Smart HVAC systems monitor occupancy and adjust heating/cooling automatically to save energy."
-      },
-      {
-        question: "What platform allows residents to access services like permits online?",
-        options: [
-          "City Hall Only",
-          "Open Data Portals",
-          "Social Media",
-          "Library Bulletin Boards"
-        ],
-        answer: 1,
-        snippet: "💻 Open Data Portals let residents access permits, zoning info, and city datasets without visiting City Hall."
-      }
-    ];
+let currentQuestion = 0;
+let score = 0;
+let answered = false;
 
-    let currentQuestion = 0;
-    let score = 0;
+const startScreen = document.getElementById("start-screen");
+const questionContainer = document.getElementById("question-container");
+const questionImage = document.getElementById("question-image");
+const questionText = document.getElementById("question-text");
+const optionsList = document.getElementById("options-list");
+const feedbackDiv = document.getElementById("feedback");
+const feedbackResult = document.getElementById("feedback-result");
+const feedbackSnippet = document.getElementById("feedback-snippet");
+const nextBtn = document.getElementById("next-btn");
+const endScreen = document.getElementById("end-screen");
+const scoreDiv = document.getElementById("score");
+const playAgainBtn = document.getElementById("play-again-btn");
+const exitBtn = document.getElementById("exit-btn");
 
-    function startGame() {
-      document.getElementById('landing').style.display = 'none';
-      document.getElementById('game').style.display = 'block';
-      showQuestion();
+document.getElementById("start-btn").addEventListener("click", () => {
+  startScreen.classList.remove("active");
+  currentQuestion = 0;
+  score = 0;
+  showQuestion();
+  questionContainer.classList.add("active");
+});
+
+function showQuestion() {
+  answered = false;
+  const q = questions[currentQuestion];
+  questionImage.style.display = "none";
+  if (q.image) {
+    questionImage.src = q.image;
+    questionImage.style.display = "block";
+  }
+  questionText.textContent = q.question;
+  optionsList.innerHTML = "";
+  q.options.forEach((opt, i) => {
+    const li = document.createElement("li");
+    li.textContent = opt;
+    li.addEventListener("click", () => selectAnswer(i));
+    optionsList.appendChild(li);
+  });
+  feedbackDiv.classList.remove("active");
+  questionContainer.classList.add("active");
+}
+
+function selectAnswer(index) {
+  if (answered) return;
+  answered = true;
+  const q = questions[currentQuestion];
+  const correct = index === q.answer;
+  if (correct) {
+    score++;
+    feedbackResult.textContent = "Correct! 🎉";
+    feedbackResult.style.color = "#7FFF00"; // chartreuse green
+  } else {
+    feedbackResult.textContent = `Wrong! ❌ The correct answer is: "${q.options[q.answer]}"`;
+    feedbackResult.style.color = "#FF6347"; // tomato red
+  }
+  feedbackSnippet.textContent = q.snippet;
+  // Highlight selection & correct
+  [...optionsList.children].forEach((li, i) => {
+    li.style.pointerEvents = "none";
+    if (i === index) {
+      li.classList.add("selected");
+      li.style.fontWeight = "700";
+      li.style.color = correct ? "#007700" : "#aa0000";
     }
-
-    function showQuestion() {
-      const q = questions[currentQuestion];
-      const container = document.getElementById('question-container');
-      container.innerHTML = `
-        <div class="question">${q.question}</div>
-        ${q.options.map((opt, i) => `
-          <label class="option">
-            <input type="radio" name="answer" value="${i}" onclick="submitAnswer(${i})">
-            ${opt}
-          </label>
-        `).join('')}
-      `;
-      updateProgress();
+    if (i === q.answer) {
+      li.style.backgroundColor = "#7FFF00"; // highlight correct answer
+      li.style.color = "#003300";
+      li.style.fontWeight = "700";
     }
+  });
+  questionContainer.classList.remove("active");
+  feedbackDiv.classList.add("active");
+}
 
-    function submitAnswer(selected) {
-      if (selected === questions[currentQuestion].answer) {
-        score++;
-        document.getElementById('feedback').innerHTML = "<span class='correct'>✅ Correct!</span>";
-      } else {
-        document.getElementById('feedback').innerHTML = "<span class='incorrect'>❌ Wrong!</span>";
-      }
+nextBtn.addEventListener("click", () => {
+  currentQuestion++;
+  if (currentQuestion >= questions.length) {
+    showEndScreen();
+  } else {
+    showQuestion();
+  }
+});
 
-      document.getElementById('snippet').innerHTML = questions[currentQuestion].snippet;
-      document.getElementById('game').style.display = 'none';
-      document.getElementById('explanation').style.display = 'block';
-    }
+function showEndScreen() {
+  feedbackDiv.classList.remove("active");
+  endScreen.classList.add("active");
+  scoreDiv.textContent = `Your score: ${score} / ${questions.length}`;
+}
 
-    function nextQuestion() {
-      currentQuestion++;
-      if (currentQuestion < questions.length) {
-        document.getElementById('explanation').style.display = 'none';
-        document.getElementById('game').style.display = 'block';
-        showQuestion();
-      } else {
-        endGame();
-      }
-    }
-
-    function updateProgress() {
-      let percent = ((currentQuestion+1) / questions.length) * 100;
-      document.getElementById('progress-bar').style.width = percent + "%";
-    }
-
-    function endGame() {
-      document.getElementById('explanation').style.display = 'none';
-      document.getElementById('results').style.display = 'block';
-      document.getElementById('score').innerText = `You scored ${score} out of ${questions.length}!`;
-    }
-
-    function restartGame() {
-      currentQuestion = 0;
-      score = 0;
-      document.getElementById('results').style.display = 'none';
-      document.getElementById('landing').style.display = 'block';
-    }
-  </script>
-
-</body>
-</html>
-
+playAgainBtn.addEventListener("
