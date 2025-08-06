@@ -4,29 +4,100 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart Cities Trivia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f4f4f4; }
-    #game, #results, #explanation { display: none; }
-    .card { background: #fff; padding: 20px; border-radius: 10px; max-width: 650px; margin: 40px auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    button { padding: 10px 20px; margin-top: 15px; border: none; background: #0077cc; color: white; font-size: 16px; border-radius: 5px; cursor: pointer; }
-    button:hover { background: #005fa3; }
-    .question { font-weight: bold; margin-bottom: 15px; }
-    .option { display: block; margin: 8px 0; }
-    .snippet { background: #eef7ff; padding: 15px; border-left: 5px solid #0077cc; margin-top: 20px; border-radius: 5px; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #0077cc, #00c6ff);
+      color: #333;
+    }
+    header {
+      text-align: center;
+      color: white;
+      padding: 30px 10px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5em;
+    }
+    .card {
+      background: #fff;
+      padding: 25px;
+      border-radius: 15px;
+      max-width: 700px;
+      margin: 20px auto;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    }
+    button {
+      padding: 12px 25px;
+      margin-top: 15px;
+      border: none;
+      background: #0077cc;
+      color: white;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #005fa3;
+    }
+    .question {
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    .option {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .snippet {
+      background: #eef7ff;
+      padding: 15px;
+      border-left: 5px solid #0077cc;
+      margin-top: 20px;
+      border-radius: 5px;
+    }
+    .correct { color: green; font-weight: bold; }
+    .incorrect { color: red; font-weight: bold; }
+    #progress {
+      background: #ddd;
+      border-radius: 10px;
+      height: 15px;
+      margin-bottom: 20px;
+    }
+    #progress-bar {
+      width: 0%;
+      background: #0077cc;
+      height: 15px;
+      border-radius: 10px;
+    }
   </style>
 </head>
 <body>
 
+  <header>
+    <h1>🌆 Smart Cities Trivia</h1>
+    <p>Learn & Play: Explore how technology shapes our cities</p>
+  </header>
+
   <!-- Landing Page -->
   <div id="landing" class="card">
-    <h2>Welcome to Smart Cities Trivia!</h2>
-    <p>Learn about smart city technologies while testing your knowledge. Select an answer, see if you’re right or wrong, 
-       and read a quick lesson before moving on. Your final score will show at the end.</p>
+    <h2>Welcome!</h2>
+    <p>Test your knowledge about Smart City technologies. Select an answer, get instant feedback, 
+       and learn with quick lessons after each question.</p>
     <button onclick="startGame()">Start Game</button>
   </div>
 
   <!-- Game Page -->
   <div id="game" class="card">
+    <div id="progress">
+      <div id="progress-bar"></div>
+    </div>
     <div id="question-container"></div>
   </div>
 
@@ -39,7 +110,7 @@
 
   <!-- Results Page -->
   <div id="results" class="card">
-    <h2>Game Over!</h2>
+    <h2>🎉 Game Over!</h2>
     <p id="score"></p>
     <button onclick="restartGame()">Play Again</button>
   </div>
@@ -55,7 +126,7 @@
           "The division of a city’s energy grid"
         ],
         answer: 1,
-        snippet: "The digital divide refers to the gap between individuals and communities that have access to modern information and communication technology, and those that don’t."
+        snippet: "📶 The digital divide is the gap between those with and without access to digital technology like the internet and computers."
       },
       {
         question: "Which technology helps reduce traffic congestion in smart cities?",
@@ -66,7 +137,7 @@
           "Paper maps"
         ],
         answer: 0,
-        snippet: "Smart traffic lights use sensors and real-time data to adjust light cycles, reducing traffic congestion and improving safety."
+        snippet: "🚦 Smart traffic lights use sensors and real-time data to optimize traffic flow, reducing congestion and emissions."
       },
       {
         question: "Which system uses sensors to lower energy use in buildings?",
@@ -77,7 +148,7 @@
           "Ceiling fans"
         ],
         answer: 0,
-        snippet: "Smart HVAC systems use IoT sensors to monitor occupancy and conditions, adjusting heating and cooling to save energy."
+        snippet: "🌡️ Smart HVAC systems monitor occupancy and adjust heating/cooling automatically to save energy."
       },
       {
         question: "What platform allows residents to access services like permits online?",
@@ -88,7 +159,7 @@
           "Library Bulletin Boards"
         ],
         answer: 1,
-        snippet: "Open Data Portals provide online access to city services, allowing residents to apply for permits, check zoning info, and explore city datasets."
+        snippet: "💻 Open Data Portals let residents access permits, zoning info, and city datasets without visiting City Hall."
       }
     ];
 
@@ -113,17 +184,18 @@
           </label>
         `).join('')}
       `;
+      updateProgress();
     }
 
     function submitAnswer(selected) {
       if (selected === questions[currentQuestion].answer) {
         score++;
-        document.getElementById('feedback').innerText = "✅ Correct!";
+        document.getElementById('feedback').innerHTML = "<span class='correct'>✅ Correct!</span>";
       } else {
-        document.getElementById('feedback').innerText = "❌ Wrong!";
+        document.getElementById('feedback').innerHTML = "<span class='incorrect'>❌ Wrong!</span>";
       }
 
-      document.getElementById('snippet').innerText = questions[currentQuestion].snippet;
+      document.getElementById('snippet').innerHTML = questions[currentQuestion].snippet;
       document.getElementById('game').style.display = 'none';
       document.getElementById('explanation').style.display = 'block';
     }
@@ -137,6 +209,11 @@
       } else {
         endGame();
       }
+    }
+
+    function updateProgress() {
+      let percent = ((currentQuestion+1) / questions.length) * 100;
+      document.getElementById('progress-bar').style.width = percent + "%";
     }
 
     function endGame() {
@@ -155,3 +232,4 @@
 
 </body>
 </html>
+
